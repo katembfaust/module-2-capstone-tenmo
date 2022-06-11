@@ -5,49 +5,49 @@ import org.springframework.data.annotation.Id;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-@Entity
+
 public class Account {
 
-    Account(){}
+    @NotNull
+    private int accountId;
+    @NotNull
+    private int userId;
+    @NotNull
+    private Balance balance;
 
-    //    all args constructor
-    public Account(Long accountId, Long userId, BigDecimal balance) {
+    public Account() {}
+
+    public Account(int accountId, int userId, Balance balance) {
         this.accountId = accountId;
         this.userId = userId;
         this.balance = balance;
     }
 
-    //    JPA annotation
-    @javax.persistence.Id
-    private Long accountId;
-    private Long userId;
-    private BigDecimal balance;
-
-
     //  getters & setters
-    public Long getAccountId() {
+    public int getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(Long accountId) {
+    public void setAccountId(int accountId) {
         this.accountId = accountId;
     }
 
-    public Long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public BigDecimal getBalance() {
+    public Balance getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Balance balance) {
         this.balance = balance;
     }
 

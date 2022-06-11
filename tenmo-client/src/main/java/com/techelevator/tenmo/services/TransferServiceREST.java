@@ -11,9 +11,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-
-
-
 public class TransferServiceREST implements TransferService {
     private String baseUrl = "http://localhost:8080/";
     private RestTemplate restTemplate = new RestTemplate();
@@ -35,7 +32,7 @@ public class TransferServiceREST implements TransferService {
             restTemplate.exchange(transferURL, HttpMethod.POST, entity, Transfer.class);
         } catch(RestClientResponseException e) {
             if (e.getMessage().contains("We know capitalism is hard. You don't have any money. :( ")) {
-                System.out.println("You don't have enough TEnmo Bucks");
+                System.out.println("It looks like you don't have enough money for that transfer, babe.");
             }
         }
     }
@@ -46,8 +43,10 @@ public class TransferServiceREST implements TransferService {
         try {
             transfers = restTemplate.exchange(baseUrl + "/transfers", HttpMethod.GET,
                     makeEntity(authenticatedUser), Transfer[].class).getBody();
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
+        } catch (RestClientResponseException e) {
+            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("We could complete this request due to a network error. Please try again.");
         }
         return transfers;
     }
@@ -55,10 +54,12 @@ public class TransferServiceREST implements TransferService {
     public Transfer getTransferById(AuthenticatedUser authenticatedUser, Transfer transferId) {
         Transfer transfer = null;
         try {
-            transfer = restTemplate.exchange(baseUrl + "/transfers/" + transfer.getTransferId(),
+            transfer = restTemplate.exchange(baseUrl + "/transfers/" + transferId,
                     HttpMethod.GET, makeEntity(authenticatedUser), Transfer.class).getBody();
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
+        } catch (RestClientResponseException e) {
+            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("We could complete this request due to a network error. Please try again.");
         }
         return transfer;
     }
