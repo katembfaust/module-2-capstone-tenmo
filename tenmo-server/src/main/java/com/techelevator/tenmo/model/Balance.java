@@ -9,19 +9,19 @@ public class Balance {
 
     @Min(value = 0)
     @NotNull
-    BigDecimal balance;
+    Double balance;
 
     public Balance() {}
 
-    public Balance(BigDecimal balance) {
+    public Balance(Double balance) {
         this.balance = balance;
     }
 
-    public BigDecimal getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 

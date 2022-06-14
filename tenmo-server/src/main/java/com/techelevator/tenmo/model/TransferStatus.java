@@ -4,19 +4,19 @@ public class TransferStatus {
 
     public TransferStatus(){}
 
-    public TransferStatus(int transferStatusId, String transferStatusDesc) {
+    public TransferStatus(Long transferStatusId, String transferStatusDesc) {
         this.transferStatusId = transferStatusId;
         this.transferStatusDesc = transferStatusDesc;
     }
 
-    private int transferStatusId;
+    private Long transferStatusId;
     private String transferStatusDesc;
 
-    public int getTransferStatusId() {
+    public Long getTransferStatusId() {
         return transferStatusId;
     }
 
-    public void setTransferStatusId(int transferStatusId) {
+    public void setTransferStatusId(Long transferStatusId) {
         this.transferStatusId = transferStatusId;
     }
 

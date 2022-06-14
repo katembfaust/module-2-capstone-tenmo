@@ -6,10 +6,7 @@ import com.techelevator.tenmo.model.Balance;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.util.BasicLogger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -20,19 +17,20 @@ public class AccountServiceREST implements AccountService {
 
     private String baseUrl = "http://localhost8080";
     private RestTemplate restTemplate = new RestTemplate();
+    private AuthenticatedUser authenticatedUser;
 
 
-    public AccountServiceREST(String baseUrl) {
+    public AccountServiceREST(String baseUrl, AuthenticatedUser authenticatedUser) {
         this.baseUrl = baseUrl;
-        this.restTemplate = new RestTemplate();
+        this.authenticatedUser = authenticatedUser;
     }
 
     @Override
-    public BigDecimal getBalance(AuthenticatedUser authenticatedUser) {
-        HttpEntity entity = makeEntity(authenticatedUser);
-       BigDecimal balance = null;
+    public Double getBalance() {
+        HttpEntity entity = makeAuthEntity();
+       Double balance = null;
         try {
-            balance = restTemplate.exchange(baseUrl + "/balance", HttpMethod.GET, entity, BigDecimal.class).getBody();
+            balance = restTemplate.exchange(baseUrl + "/balance", HttpMethod.GET, entity, Double.class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
         } catch (ResourceAccessException e) {
@@ -56,7 +54,7 @@ public class AccountServiceREST implements AccountService {
     }
 
     @Override
-    public Account getAccountByUserId(AuthenticatedUser authenticatedUser, Long userId) {
+    public Account getAccountByUserId(Long userId) {
         HttpEntity entity = new HttpEntity<>(authenticatedUser);
         Account account = null;
         try {
@@ -69,11 +67,54 @@ public class AccountServiceREST implements AccountService {
         return account;
     }
 
-    public HttpEntity makeEntity(AuthenticatedUser authenticatedUser) {
-        HttpHeaders headers = new HttpHeaders();
+    @Override
+    public Account depositAccount(Account account, Long id, Double amount) {
+        account = null;
+        HttpEntity entity = makeAuthEntity();
+        try {
+            account = restTemplate.exchange(baseUrl + "/deposit/user/" + id + amount, HttpMethod.PUT, entity, Account.class).getBody();
+        } catch (RestClientResponseException e) {
+            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("We could complete this request due to a network error. Please try again.");
+        }
+        return account;
+    }
 
+    @Override
+    public Account withdrawAccount(Account account, Long id, Double amount) {
+        account = null;
+        HttpEntity entity = makeAuthEntity();
+        try {
+            account = restTemplate.exchange(baseUrl + "/withdrawal/user/" + id + amount, HttpMethod.PUT, entity, Account.class).getBody();
+        } catch (RestClientResponseException e) {
+            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("We could complete this request due to a network error. Please try again.");
+        }
+        return account;
+    }
+
+    public Account[] listAccounts(){
+        Account[] accounts = null;
+        try{
+            ResponseEntity<Account[]> response =
+                    restTemplate.exchange(baseUrl +"accounts/",
+                            HttpMethod.GET,
+                            makeAuthEntity(),
+                            Account[].class);
+            accounts=response.getBody();
+        }catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return accounts;
+    }
+
+    private HttpEntity<Void> makeAuthEntity() {
+        HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
-        HttpEntity entity = new HttpEntity(headers);
-        return entity;
+        return new HttpEntity<>(headers);
     }
 }

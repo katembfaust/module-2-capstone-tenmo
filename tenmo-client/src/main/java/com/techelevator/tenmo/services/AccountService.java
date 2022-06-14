@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 
 public interface AccountService {
 
-    BigDecimal getBalance(AuthenticatedUser authenticatedUser);
+    Double getBalance();
     Account getAccountByAccountId(AuthenticatedUser authenticatedUser, Long accountId);
-    Account getAccountByUserId(AuthenticatedUser authenticatedUser, Long userId);
+    Account getAccountByUserId(Long userId);
+    Account depositAccount(Account account, Long id, Double amount);
+    Account withdrawAccount(Account account, Long id, Double amount);
 }

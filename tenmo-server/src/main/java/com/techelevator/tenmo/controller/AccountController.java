@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-//@PreAuthorize("isAuthenticated")
+@PreAuthorize("isAuthenticated")
 public class AccountController {
 
    @Autowired
@@ -28,26 +28,48 @@ public class AccountController {
 
     private TransferStatusDao transferStatusDao;
 
-
+    @PreAuthorize("permitAll")
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
-    public BigDecimal getBalance(Principal user) {
+    public Double getBalance(Principal user) {
         System.out.println(user.getName());
-        BigDecimal balance = new BigDecimal(String.valueOf(accountDao.getBalance(user.getClass().getModifiers())));
-        return balance;
+        return accountDao.getBalanceByUserId(userDao.findIdByUsername(user.getName()));
     }
 
-    @RequestMapping(path = "/account/{id}", method = RequestMethod.GET)
-    public Account getAccountByAccountId(@Valid @PathVariable int accountId) {
-        return accountDao.getAccountByAccountId(accountId);
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "account/{id}", method = RequestMethod.GET)
+    public Account getAccountByAccountId(@Valid @PathVariable Long id) {
+        return accountDao.getAccountByAccountId(id);
     }
 
+    @PreAuthorize("permitAll")
     @RequestMapping(path = "account/user/{id}", method = RequestMethod.GET)
-    public Account getAccountByUserId(@Valid @PathVariable int userId) {
-        return accountDao.getAccountByUserId(userId);
+    public Account getAccountByUserId(@Valid @PathVariable Long id) {
+        return accountDao.getAccountByUserId(id);
     }
 
-    @RequestMapping(path = "/users", method = RequestMethod.GET)
-    public List<User> getUsers() { return userDao.findAll(); }
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "users", method = RequestMethod.GET)
+    public User[] getUsers() { return userDao.findAll(); }
+
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "deposit/user/{id}/{amount}", method = RequestMethod.PUT)
+    public Account depositAccount(@Valid @RequestBody Account account, @PathVariable Long id, @PathVariable Double amount) {
+       return accountDao.depositAccount(account, id, amount);
+    }
+
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "withdrawal/user/{id}/{amount}", method = RequestMethod.PUT)
+    public Account withdrawalAccount(@Valid @RequestBody Account account, @PathVariable Long id, @PathVariable Double amount) {
+        return accountDao.withdrawAccount(account, id, amount);
+    }
+
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "accounts/", method = RequestMethod.GET)
+    public Account[] findAllAccounts() { return accountDao.findAllAccounts(); }
+
+
+
+
 
 
 

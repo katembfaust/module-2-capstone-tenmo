@@ -15,6 +15,10 @@ public class TransferStatusREST implements TransferStatus {
     private String baseUrl = "http://localhost:8080/";
     private RestTemplate restTemplate = new RestTemplate();
 
+    public TransferStatusREST(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     @Override
     public TransferStatus getTransferStatus(AuthenticatedUser authenticatedUser, String description) {
         HttpEntity entity = new HttpEntity<>(authenticatedUser);

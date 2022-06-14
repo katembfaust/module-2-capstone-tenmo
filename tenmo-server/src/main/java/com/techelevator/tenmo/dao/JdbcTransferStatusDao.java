@@ -46,7 +46,7 @@ public class JdbcTransferStatusDao implements TransferStatusDao {
     }
 
     private TransferStatus mapRowToTransferStatus(SqlRowSet results) {
-        int transferStatusId = results.getInt("transfer_status_id");
+       Long transferStatusId = results.getLong("transfer_status_id");
        String transferStatusDesc = results.getString("transfer_status_desc");
 
         TransferStatus transferStatus = new TransferStatus(transferStatusId, transferStatusDesc);

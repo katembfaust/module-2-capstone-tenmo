@@ -24,7 +24,7 @@ public class JdbcTransferTypeDao implements TransferTypeDao {
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, description);
             if (results.next()) {
-                int transferTypeId = results.getInt("transfer_type_id");
+               Long transferTypeId = results.getLong("transfer_type_id");
                 String transferTypeDescription = results.getString("transfer_type_desc");
 
                 transferType = new TransferType(transferTypeId, transferTypeDescription);
@@ -43,7 +43,7 @@ public class JdbcTransferTypeDao implements TransferTypeDao {
         TransferType transferType = null;
         if (result.next()) {
 
-            int transferTyId = result.getInt("transfer_type_id");
+            Long transferTyId = result.getLong("transfer_type_id");
             String transferTypeDesc = result.getString("transfer_type_desc");
 
             transferType = new TransferType(transferTyId, transferTypeDesc);

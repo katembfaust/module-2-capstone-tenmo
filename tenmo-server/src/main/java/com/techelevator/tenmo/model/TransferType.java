@@ -1,21 +1,21 @@
 package com.techelevator.tenmo.model;
 
 public class TransferType {
-    private int transferTypeId;
+    private Long transferTypeId;
     private String transferTypeDescription;
 
     public TransferType(){}
 
-    public TransferType(int transferTypeId, String transferTypeDescription) {
+    public TransferType(Long transferTypeId, String transferTypeDescription) {
         this.transferTypeId = transferTypeId;
         this.transferTypeDescription = transferTypeDescription;
     }
 
-    public int getTransferTypeId() {
+    public Long getTransferTypeId() {
         return transferTypeId;
     }
 
-    public void setTransferTypeId(int transferTypeId) {
+    public void setTransferTypeId(Long transferTypeId) {
         this.transferTypeId = transferTypeId;
     }
 

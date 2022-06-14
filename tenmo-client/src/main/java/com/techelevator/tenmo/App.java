@@ -1,13 +1,12 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Balance;
-import com.techelevator.tenmo.model.UserCredentials;
-import com.techelevator.tenmo.services.AccountServiceREST;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.tenmo.model.*;
+import com.techelevator.tenmo.services.*;
+import io.cucumber.java.bs.A;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class App {
 
@@ -17,15 +16,12 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
-    private AccountServiceREST accountServiceREST = new AccountServiceREST(API_BASE_URL);
+    private AccountServiceREST accountServiceREST;
+
 
     public App() {
     }
 
-//    public App(AuthenticatedUser currentUser, AccountServiceREST accountServiceREST) {
-//        this.currentUser = currentUser;
-//        this.accountServiceREST = new AccountServiceREST(API_BASE_URL);
-//    }
 
     public static void main(String[] args) {
         App app = new App();
@@ -98,7 +94,8 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-        BigDecimal balance = accountServiceREST.getBalance(currentUser);
+        accountServiceREST = new AccountServiceREST(API_BASE_URL, currentUser);
+        Double balance = accountServiceREST.getBalance();
         System.out.println("Your current account balance is: $ " + balance);
 	}
 
@@ -113,9 +110,38 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+        accountServiceREST = new AccountServiceREST(API_BASE_URL, currentUser);
+        UserService userService = new UserService(API_BASE_URL, currentUser);
+        TransferServiceREST transferServiceREST = new TransferServiceREST(API_BASE_URL);
+        TransferStatusREST transferStatusREST = new TransferStatusREST(API_BASE_URL);
+        TransferTypeREST transferTypeREST = new TransferTypeREST(API_BASE_URL);
+
+        Double balance = accountServiceREST.getBalance();
+        User[] users = userService.getAllUsers(currentUser);
+        System.out.println("-------------------------------------------\n" +
+                "User ID             " + "Name \n" +
+                "-------------------------------------------\n" );
+        for (User userlist : users) {
+            if (!userlist.getId().equals(currentUser.getUser().getId()))
+            System.out.println(userlist.getId()+ "                "+ userlist.getUsername());
+        }
+        Account[] accounts = accountServiceREST.listAccounts();
+        System.out.println("-------------------------------------------\n");
+
+            Long sendTo = consoleService.promptForLong("Please select the user ID that you'd like to send TEnmo bucks to (0 to cancel): ");
+        System.out.println("You have selected User ID: " + sendTo + "\n");
+            Double amountToSend = consoleService.promptForDouble("Please indicate the amount of TEBucks you'd like to send to User ID " + sendTo + ": ");
+            Long sendFrom = currentUser.getUser().getId();
+            if (amountToSend > 0 && amountToSend <= balance ) {
+                transferServiceREST.createTransfer(2L, 2L, sendFrom, sendTo, amountToSend);
+                Account senderAccountObj = accountServiceREST.getAccountByUserId(sendFrom);
+                accountServiceREST.withdrawAccount(senderAccountObj, sendFrom, amountToSend);
+                Account receiverAccountObj = accountServiceREST.getAccountByUserId(sendTo);
+                accountServiceREST.depositAccount(receiverAccountObj, sendTo, amountToSend);
+            }
+
+        }
+
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub

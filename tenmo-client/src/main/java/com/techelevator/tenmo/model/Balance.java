@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 public class Balance {
 
-    BigDecimal balance;
+    Double balance;
 
-    public BigDecimal getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 }

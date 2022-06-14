@@ -11,53 +11,44 @@ import java.math.BigDecimal;
 
 public class Account {
 
-    @NotNull
-    private int accountId;
-    @NotNull
-    private int userId;
-    @NotNull
-    private Balance balance;
+
+    private Long accountId;
+    private Long userId;
+    private Double balance;
 
     public Account() {}
 
-    public Account(int accountId, int userId, Balance balance) {
+    public Account(Long accountId, Long userId, Double balance) {
         this.accountId = accountId;
         this.userId = userId;
-        this.balance = balance;
+       this.balance = balance;
     }
 
     //  getters & setters
-    public int getAccountId() {
+
+
+    public Long getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(Long accountId) {
         this.accountId = accountId;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public Balance getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(Balance balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
-    }
-
-    @Override
-    public String toString() {
-        return "Account{" +
-                "accountId=" + accountId +
-                ", userId=" + userId +
-                ", balance=" + balance +
-                '}';
     }
 }
 

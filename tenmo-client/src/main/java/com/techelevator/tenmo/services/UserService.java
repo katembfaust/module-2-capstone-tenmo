@@ -13,11 +13,17 @@ public class UserService {
 
     private String baseUrl = "http://localhost:8080/";
     private RestTemplate restTemplate = new RestTemplate();
+    private AuthenticatedUser user;
+
+    public UserService(String baseUrl, AuthenticatedUser user) {
+        this.baseUrl = baseUrl;
+        this.user = user;
+    }
 
     public User[] getAllUsers(AuthenticatedUser authenticatedUser) {
         User[] users = null;
         try {
-            users = restTemplate.exchange(baseUrl + "/users", HttpMethod.GET, makeEntity(authenticatedUser),
+            users = restTemplate.exchange(baseUrl + "/users", HttpMethod.GET, makeAuthEntity(),
                     User[].class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
@@ -27,11 +33,11 @@ public class UserService {
         return users;
     }
 
-    public User getByUserId(AuthenticatedUser authenticatedUser, Long userId) {
+    public User getByUserId(Long userId) {
         User user = null;
         try {
             user = restTemplate.exchange(baseUrl + "/user/" + userId, HttpMethod.GET,
-                    makeEntity(authenticatedUser), User.class).getBody();
+                    makeAuthEntity(), User.class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
         } catch (ResourceAccessException e) {
@@ -40,11 +46,10 @@ public class UserService {
         return user;
     }
 
-    private HttpEntity<User> makeEntity(AuthenticatedUser user) {
+    private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(user.getToken());
-        HttpEntity entity = new HttpEntity<>(headers);
-        return entity;
+        return new HttpEntity<>(headers);
     }
 
 

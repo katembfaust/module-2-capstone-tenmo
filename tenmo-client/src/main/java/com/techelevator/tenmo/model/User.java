@@ -22,13 +22,11 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof User) {
-            User otherUser = (User) other;
-            return otherUser.getId().equals(id)
-                    && otherUser.getUsername().equals(username);
-        } else {
-            return false;
-        }
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                '}';
     }
 }
+
