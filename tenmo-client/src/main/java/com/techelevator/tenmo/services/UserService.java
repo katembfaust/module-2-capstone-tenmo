@@ -1,10 +1,12 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -50,6 +52,13 @@ public class UserService {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(user.getToken());
         return new HttpEntity<>(headers);
+    }
+
+    private HttpEntity<User> makeAuthEntity(User authUser) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(user.getToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(authUser,headers);
     }
 
 

@@ -57,41 +57,40 @@ public class AccountServiceREST implements AccountService {
     public Account getAccountByUserId(Long userId) {
         HttpEntity entity = new HttpEntity<>(authenticatedUser);
         Account account = null;
-        try {
-            account = restTemplate.exchange(baseUrl + "/account/" + userId, HttpMethod.GET, entity, Account.class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
-        } catch (ResourceAccessException e) {
-            System.out.println("We could complete this request due to a network error. Please try again.");
-        }
+//        try {
+            account = restTemplate.exchange(baseUrl + "/account/" + "user/" + userId, HttpMethod.GET, entity, Account.class).getBody();
+//        } catch (RestClientResponseException e) {
+//            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+//        } catch (ResourceAccessException e) {
+//            System.out.println("We could complete this request due to a network error. Please try again.");
+//        }
         return account;
     }
 
     @Override
     public Account depositAccount(Account account, Long id, Double amount) {
-        account = null;
-        HttpEntity entity = makeAuthEntity();
-        try {
-            account = restTemplate.exchange(baseUrl + "/deposit/user/" + id + amount, HttpMethod.PUT, entity, Account.class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
-        } catch (ResourceAccessException e) {
-            System.out.println("We could complete this request due to a network error. Please try again.");
-        }
+
+        HttpEntity entity = makeAuthEntity(account);
+//        try {
+            account = restTemplate.exchange(baseUrl + "/deposit/user/" + id + "/" + amount, HttpMethod.PUT, entity, Account.class).getBody();
+//        } catch (RestClientResponseException e) {
+//            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+//        } catch (ResourceAccessException e) {
+//            System.out.println("We could complete this request due to a network error. Please try again.");
+//        }
         return account;
     }
 
     @Override
     public Account withdrawAccount(Account account, Long id, Double amount) {
-        account = null;
-        HttpEntity entity = makeAuthEntity();
-        try {
-            account = restTemplate.exchange(baseUrl + "/withdrawal/user/" + id + amount, HttpMethod.PUT, entity, Account.class).getBody();
-        } catch (RestClientResponseException e) {
-            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
-        } catch (ResourceAccessException e) {
-            System.out.println("We could complete this request due to a network error. Please try again.");
-        }
+        HttpEntity entity = makeAuthEntity(account);
+//        try {
+            account = restTemplate.exchange(baseUrl + "withdrawal/user/" + id + "/" + amount, HttpMethod.PUT, entity, Account.class).getBody();
+//        } catch (RestClientResponseException e) {
+//            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+//        } catch (ResourceAccessException e) {
+//            System.out.println("We could complete this request due to a network error. Please try again.");
+//        }
         return account;
     }
 
@@ -116,5 +115,12 @@ public class AccountServiceREST implements AccountService {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
         return new HttpEntity<>(headers);
+    }
+
+    private HttpEntity<Account> makeAuthEntity(Account account) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authenticatedUser.getToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(account,headers);
     }
 }

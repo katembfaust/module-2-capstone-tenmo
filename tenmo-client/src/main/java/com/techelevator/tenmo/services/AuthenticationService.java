@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.services;
 
+import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -46,6 +47,18 @@ public class AuthenticationService {
         }
         return success;
     }
+
+//    public AuthenticatedUser getAuthUserById() {
+//        AuthenticatedUser user = null;
+//        try {
+//            user = restTemplate.exchange(baseUrl + "/user/" + userId, HttpMethod.GET,
+//                    makeAuthEntity(), User.class).getBody();
+//        } catch (RestClientResponseException e) {
+//            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+//        } catch (ResourceAccessException e) {
+//            System.out.println("We could complete this request due to a network error. Please try again.");
+//        }
+//        return user;return authenticatedUser; }
 
     private HttpEntity<UserCredentials> createCredentialsEntity(UserCredentials credentials) {
         HttpHeaders headers = new HttpHeaders();

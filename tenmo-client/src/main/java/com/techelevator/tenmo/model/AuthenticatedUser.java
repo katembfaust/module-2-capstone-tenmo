@@ -4,6 +4,7 @@ public class AuthenticatedUser {
 	
 	private String token;
 	private User user;
+	private AuthenticatedUser authenticatedUser;
 	
 	public String getToken() {
 		return token;

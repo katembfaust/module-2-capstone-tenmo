@@ -14,9 +14,11 @@ import org.springframework.web.client.RestTemplate;
 public class TransferStatusREST implements TransferStatus {
     private String baseUrl = "http://localhost:8080/";
     private RestTemplate restTemplate = new RestTemplate();
+    private AuthenticatedUser authenticatedUser;
 
-    public TransferStatusREST(String baseUrl) {
+    public TransferStatusREST(String baseUrl, AuthenticatedUser authenticatedUser) {
         this.baseUrl = baseUrl;
+        this.authenticatedUser = authenticatedUser;
     }
 
     @Override

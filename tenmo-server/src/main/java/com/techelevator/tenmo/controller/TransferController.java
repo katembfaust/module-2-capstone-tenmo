@@ -47,8 +47,16 @@ public class TransferController {
     @PreAuthorize("permitAll")
     @RequestMapping(path = "transfers/account/{id}", method = RequestMethod.GET)
     public List<Transfer> getTransfersByAccountId(@Valid @PathVariable Long id) {
-        return transferDao.getTransfersByAccountId(id);
+        return null;
     }
+
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "transfers/user/{id}", method = RequestMethod.GET)
+    public List<Transfer> getTransfersByUserId(@Valid @PathVariable Long id) {
+        return transferDao.getTransfersByUserId(id);
+    }
+
+
 
 
 }

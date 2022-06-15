@@ -14,9 +14,11 @@ import org.springframework.web.client.RestTemplate;
 public class TransferTypeREST implements TransferType {
     private String baseUrl = "http://localhost:8080/";
     private RestTemplate restTemplate = new RestTemplate();
+    private AuthenticatedUser authenticatedUser;
 
-    public TransferTypeREST(String baseUrl) {
+    public TransferTypeREST(String baseUrl, AuthenticatedUser authenticatedUser) {
         this.baseUrl = baseUrl;
+        this.authenticatedUser = authenticatedUser;
     }
 
     @Override

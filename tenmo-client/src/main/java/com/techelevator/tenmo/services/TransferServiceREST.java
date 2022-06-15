@@ -19,8 +19,9 @@ public class TransferServiceREST implements TransferService {
     private RestTemplate restTemplate = new RestTemplate();
     private AuthenticatedUser authenticatedUser;
 
-    public TransferServiceREST(String baseUrl) {
+    public TransferServiceREST(String baseUrl, AuthenticatedUser authenticatedUser) {
         this.baseUrl = baseUrl;
+        this.authenticatedUser = authenticatedUser;
     }
 
 @Override
@@ -78,12 +79,30 @@ public class TransferServiceREST implements TransferService {
         return transfers;
     }
 
-
+    public Transfer[] getTransfersByUserId(Long userId) {
+        Transfer[] transfers = null;
+        try {
+            transfers = restTemplate.exchange(baseUrl + "transfers/" + "user/" + userId,
+                    HttpMethod.GET, makeAuthEntity(), Transfer[].class).getBody();
+        } catch (RestClientResponseException e) {
+            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("We could complete this request due to a network error. Please try again.");
+        }
+        return transfers;
+    }
 
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
         return new HttpEntity<>(headers);
+    }
+
+    private HttpEntity<Transfer> makeAuthEntity(Transfer transfer) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authenticatedUser.getToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(transfer,headers);
     }
 
 }
