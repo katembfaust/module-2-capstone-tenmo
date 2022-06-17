@@ -20,7 +20,7 @@ public class TransferStatus {
         this.transferStatusId = transferStatusId;
     }
 
-    public String getTransferStatusDesc() {
+    public String getTransferStatusDesc(String transfer_status_desc) {
         return transferStatusDesc;
     }
 

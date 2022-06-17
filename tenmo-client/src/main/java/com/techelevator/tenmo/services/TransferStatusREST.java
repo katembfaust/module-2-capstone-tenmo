@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Balance;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,10 +40,10 @@ public class TransferStatusREST implements TransferStatus {
 
     @Override
     public TransferStatus getTransferStatusById(AuthenticatedUser authenticatedUser, Long transferId) {
-        HttpEntity entity = new HttpEntity<>(authenticatedUser);
         TransferStatus transferStatus = null;
+        HttpEntity entity = makeEntity(authenticatedUser);
         try {
-            transferStatus = restTemplate.exchange(baseUrl + "/transferstatus/" + transferId, HttpMethod.GET, entity,
+            transferStatus = restTemplate.exchange(baseUrl + "transferstatus/" + transferId, HttpMethod.GET, entity,
                     TransferStatus.class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
@@ -52,10 +53,19 @@ public class TransferStatusREST implements TransferStatus {
         return transferStatus;
     }
 
+
+
     public HttpEntity makeEntity(AuthenticatedUser authenticatedUser) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
         HttpEntity entity = new HttpEntity(headers);
         return entity;
+    }
+
+    private HttpEntity<TransferStatus> makeAuthEntity(TransferStatus transferStatus) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authenticatedUser.getToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(transferStatus,headers);
     }
 }

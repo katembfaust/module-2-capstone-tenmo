@@ -5,6 +5,7 @@ public class TransferStatus {
     private int transferStatusId;
     private String transferStatusDesc;
 
+
     public int getTransferStatusId() {
         return transferStatusId;
     }

@@ -52,4 +52,11 @@ public class TransferTypeREST implements TransferType {
         HttpEntity entity = new HttpEntity(headers);
         return entity;
     }
+
+    private HttpEntity<TransferType> makeAuthEntity(TransferType transferType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authenticatedUser.getToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(transferType,headers);
+    }
 }

@@ -90,21 +90,19 @@ public class JdbcAccountDao implements AccountDao {
 
     @Override
     public Account depositAccount(Account account, Long id, Double amount)  {
-        Account account1 = getAccountByUserId(id);
-         account1.setBalance(account1.getBalance() + amount);
-         String sql = "UPDATE account SET balance = balance + ? WHERE user_id = ?; ";
-         jdbcTemplate.update(sql, amount, id);
-        return account1;
+         account.setBalance(account.getBalance() + amount);
+         String sql = "UPDATE account SET balance = ? WHERE user_id = ?; ";
+         jdbcTemplate.update(sql, account.getBalance(), id);
+        return account;
 
     }
 
     @Override
     public Account withdrawAccount(Account account, Long id, Double amount) {
-        Account account1 = getAccountByUserId(id);
-        account1.setBalance(account1.getBalance() - amount);
-        String sql = "UPDATE account SET balance = balance - ? WHERE user_id = ?; ";
-        jdbcTemplate.update(sql, amount, id);
-        return account1;
+        account.setBalance(account.getBalance() - amount);
+        String sql = "UPDATE account SET balance = ? WHERE user_id = ?; ";
+        jdbcTemplate.update(sql, account.getBalance(), id);
+        return account;
     }
 
 

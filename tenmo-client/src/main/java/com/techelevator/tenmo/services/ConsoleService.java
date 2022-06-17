@@ -1,6 +1,10 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.customexceptions.InvalidUserException;
+import com.techelevator.tenmo.customexceptions.UserNotFoundException;
+import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
@@ -99,6 +103,49 @@ public class ConsoleService {
                 System.out.println("Please enter a number.");
             }
         }
+    }
+
+    public void printUsers(User[] users) {
+        System.out.println("-------------------------------------------\n" +
+                "User ID             " + "Name \n" +
+                "-------------------------------------------\n" );
+        for (User userlist : users) {
+            System.out.println(userlist.getId() + "                " + userlist.getUsername());
+        }
+        System.out.println("-------------------------------------------\n");
+    }
+
+    public boolean userValidation(Long idChosen, User[] userList, AuthenticatedUser currentUser) {
+        if (idChosen != 0) {
+            try {
+                boolean validChoice = false;
+
+                for (User user : userList) {
+                    if (idChosen == currentUser.getUser().getId()) {
+                        throw new InvalidUserException();
+                    }
+                    if (user.getId() == idChosen) {
+                        validChoice = true;
+                        break;
+                    }
+                }
+                if (validChoice == false) {
+                    throw new UserNotFoundException();
+                }
+                return true;
+            } catch (InvalidUserException | UserNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    public void printRequestHandleOptions() {
+        System.out.println(
+       "1: Approve \n" +
+       "2: Reject \n" +
+       "0: Don't approve or reject \n");
+
     }
 
     public void pause() {

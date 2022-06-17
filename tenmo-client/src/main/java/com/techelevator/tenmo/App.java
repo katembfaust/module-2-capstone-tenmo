@@ -2,12 +2,11 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
+import com.techelevator.tenmo.services.TransferStatus;
 import io.cucumber.java.bs.A;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class App {
 
@@ -17,6 +16,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
+    private com.techelevator.tenmo.model.TransferStatus transferStatus;
     private AccountServiceREST accountServiceREST;
     private TransferServiceREST transferServiceREST;
     private UserService userService;
@@ -105,27 +105,77 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
+//        instantiating services needed
         transferServiceREST = new TransferServiceREST(API_BASE_URL, currentUser);
         transferTypeREST = new TransferTypeREST(API_BASE_URL, currentUser);
         transferStatusREST = new TransferStatusREST(API_BASE_URL, currentUser);
         userService = new UserService(API_BASE_URL, currentUser);
-        currentUser = new AuthenticatedUser();
-//       User transferUser = userService.getByUserId(currentUser.getUser().getId());
-//        Long userId = transferUser.getId();
-        Transfer[] userTransfers = transferServiceREST.getTransfersByUserId(1001L);
-        System.out.println("-------------------------------------------\n" +
-                "Transfer ID     " + "Recipient ID      " + "Amount             \n" +
-                "-------------------------------------------\n" );
-       for (Transfer transferList : userTransfers) {
-//           if (!transferList.getTransferId().equals(null)) {
-              System.out.println(transferList.getTransferId() + "            "+ transferList.getAccountTo() + "                " + transferList.getAmount());
+
+//        establishing user & getting ID in order to print
+        Transfer[] userTransfers = transferServiceREST.getTransfersByUserId(currentUser.getUser().getId());
+        System.out.println("------------------------------------------------------------------\n" +
+                "Transfer ID     " + "Sender Account      " + "Recipient Account       "+ "Amount             \n" +
+                "------------------------------------------------------------------\n");
+        Set<String> transferSet = new TreeSet<>();
+        for (Transfer transferList : userTransfers) {
+            if (!transferList.getTransferId().equals(null)) {
+                transferSet.add(transferList.getTransferId() + "            " + transferList.getAccountFrom() + "                " + transferList.getAccountTo() + "                    " + transferList.getAmount());
+//                System.out.println(transferList.getTransferId() + "            " + transferList.getAccountTo() + "                " + transferList.getAmount());
+            }
+        }
+        for (String transSet :transferSet) {
+            System.out.println(transSet);
+        }
+//        getting the transfer ID to access Transfer Details
+        System.out.println("------------------------------------------------------------------\n");
+        Long transferToViewID = consoleService.promptForLong("If you'd like to view the details of a particular transfer, please enter the Transfer ID here: ");
+
+       TransferDetails[] transferDetails = transferServiceREST.getAllTransferDetails(currentUser.getUser().getId());
+
+       for (TransferDetails transferDetailsList : transferDetails) {
+           if (transferToViewID.equals(transferDetailsList.getTransferId())) {
+               System.out.println(transferDetailsList.toString());
            }
-//        transferTypeREST.getTransferTypeById(currentUser, transferList.getTransferId())
-//        transferStatusREST.getTransferStatusById(currentUser, transferList.getTransferId())
        }
 
+    }
+
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
+        transferServiceREST = new TransferServiceREST(API_BASE_URL, currentUser);
+        accountServiceREST = new AccountServiceREST(API_BASE_URL, currentUser);
+        userService = new UserService(API_BASE_URL, currentUser);
+
+        TransferDetails[] transferDetails = transferServiceREST.getAllTransferDetails(currentUser.getUser().getId());
+
+        Account senderAccount = accountServiceREST.getAccountByUserId(currentUser.getUser().getId());
+
+        String senderUsername = currentUser.getUser().getUsername();
+
+        for (TransferDetails transferDetailsList : transferDetails) {
+            if (transferDetailsList.getTransferStatus().equalsIgnoreCase("Pending") &&  transferDetailsList.getUsernameFrom().equalsIgnoreCase(senderUsername)) {
+                System.out.println(transferDetailsList.toString());
+            }
+        }
+        Long transferToHandleID = consoleService.promptForLong("Please enter the transfer ID of the transfer you'd like to handle: ");
+        Transfer transferToHandle = transferServiceREST.getTransferById(currentUser, transferToHandleID);
+
+        consoleService.printRequestHandleOptions();
+       Long userChoice =  consoleService.promptForLong("Please select the number of the option you'd like to choose: ");
+
+       if(userChoice == 1) {
+           transferToHandle.setTransferStatusId(2L);
+           transferToHandle.setTransferId(2L);
+       transferServiceREST.updateTransfer(transferToHandle, transferToHandleID);
+
+
+       }
+       else if (userChoice == 2) {
+           transferToHandle.setTransferStatusId(2L);
+           transferToHandle.setTransferTypeId(1L);
+           transferServiceREST.updateTransfer(transferToHandle, transferToHandleID);
+       }
+
+
 		
 	}
 
@@ -133,38 +183,39 @@ public class App {
         accountServiceREST = new AccountServiceREST(API_BASE_URL, currentUser);
         userService = new UserService(API_BASE_URL, currentUser);
         transferServiceREST = new TransferServiceREST(API_BASE_URL, currentUser);
-        transferStatusREST = new TransferStatusREST(API_BASE_URL, currentUser);
-        transferTypeREST = new TransferTypeREST(API_BASE_URL, currentUser);
 
+//        Showing the user their current balance so they can decide how much money to transfer
         Double balance = accountServiceREST.getBalance();
-        User[] users = userService.getAllUsers(currentUser);
         System.out.println("-------------------------------------------\n" +
                 "Your current account balance is : $" + balance );
-        System.out.println("-------------------------------------------\n" +
-                "User ID             " + "Name \n" +
-                "-------------------------------------------\n" );
-        for (User userlist : users) {
-            if (!userlist.getId().equals(currentUser.getUser().getId()))
-            System.out.println(userlist.getId()+ "                "+ userlist.getUsername());
-        }
-        Account[] accounts = accountServiceREST.listAccounts();
-        System.out.println("-------------------------------------------\n");
+//        Presenting a list of users to choose from
+        User[] users = userService.getAllUsers(currentUser);
+        consoleService.printUsers(users);
+//        Getting the user & amount to send to
+            Long sendToUserID = consoleService.promptForLong("Please select the user ID that you'd like to send TEnmo bucks to (0 to cancel): " + "\n");
+//            if(consoleService.userValidation(sendToUserID, users, currentUser)) {
+                System.out.println("You have selected User ID: " + sendToUserID + "\n");
+//            }
+//        Gather info to initiate transfer
+                Double amountToSend = consoleService.promptForDouble("Please indicate the amount of TEBucks you'd like to send to User ID " + sendToUserID + ": ");
 
-            Long sendToUserID = consoleService.promptForLong("Please select the user ID that you'd like to send TEnmo bucks to (0 to cancel): ");
-            System.out.println("You have selected User ID: " + sendToUserID + "\n");
+                Long sendFromUserID = currentUser.getUser().getId();
+                Account senderAccount = accountServiceREST.getAccountByUserId(sendFromUserID);
+                Long sendFrom = senderAccount.getAccountId();
 
-            Double amountToSend = consoleService.promptForDouble("Please indicate the amount of TEBucks you'd like to send to User ID " + sendToUserID + ": ");
+                Account recieverAccount = accountServiceREST.getAccountByUserId(sendToUserID);
+                Long sendTo = recieverAccount.getAccountId();
 
-            Long sendFromUserID = currentUser.getUser().getId();
-            Account senderAccount = accountServiceREST.getAccountByUserId(sendFromUserID);
-            Long sendFrom = senderAccount.getAccountId();
-
-
-            Account recieverAccount = accountServiceREST.getAccountByUserId(sendToUserID);
-            Long sendTo = recieverAccount.getAccountId();
-
+//      Create transfer & add
             if (amountToSend > 0 && amountToSend <= balance ) {
-                transferServiceREST.createTransfer(2L, 2L, sendFrom, sendTo, amountToSend);
+                Transfer transfer = new Transfer();
+                transfer.setTransferTypeId(2L);
+                transfer.setTransferStatusId(2L);
+                transfer.setAccountFrom(sendFrom);
+                transfer.setAccountTo(sendTo);
+                transfer.setAmount(amountToSend);
+
+                transferServiceREST.createTransfer(transfer);
 
                 accountServiceREST.withdrawAccount(senderAccount, sendFromUserID, amountToSend);
 
@@ -173,16 +224,50 @@ public class App {
 
             Double updatedBalance = accountServiceREST.getBalance();
 
-
-        System.out.println("-------------------------------------------\n");
+        System.out.println("------------------------------------------------------\n");
         System.out.println("Your transfer to User ID: " + sendToUserID + " for the amount of $" + amountToSend + " has been initiated. \n" +
                         "Your new account balance is: " + updatedBalance + "\n");
         }
 
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+        accountServiceREST = new AccountServiceREST(API_BASE_URL, currentUser);
+        userService = new UserService(API_BASE_URL, currentUser);
+        transferServiceREST = new TransferServiceREST(API_BASE_URL, currentUser);
+
+        User[] users = userService.getAllUsers(currentUser);
+        consoleService.printUsers(users);
+
+        Long senderUserId = consoleService.promptForLong("Enter the ID of the user you'd like to request money from.(0 to cancel) ");
+        Long requesterUserId  = currentUser.getUser().getId();
+        System.out.println("You have selected User ID: " + senderUserId + "\n");
+//            }
+//        Gather info to initiate request
+        Double amountToRequest = consoleService.promptForDouble("Please indicate the amount of TEBucks you'd like to request from User ID " + senderUserId + ": ");
+
+        Account senderAccount = accountServiceREST.getAccountByUserId(senderUserId);
+        Account requesterAccount = accountServiceREST.getAccountByUserId(requesterUserId);
+
+
+        Long accountFrom = senderAccount.getAccountId();
+        Long accountTo = requesterAccount.getAccountId();
+
+
+        if (amountToRequest > 0) {
+            Transfer transfer = new Transfer();
+            transfer.setTransferTypeId(1L);
+            transfer.setTransferStatusId(1L);
+            transfer.setAccountFrom(accountFrom);
+            transfer.setAccountTo(accountTo);
+            transfer.setAmount(amountToRequest);
+
+            transferServiceREST.createTransfer(transfer);
+        }
+
+        System.out.println("------------------------------------------------------\n");
+        System.out.println("Your request to User ID: " + senderUserId + " for the amount of $" + amountToRequest + " is now pending. \n");
+
+    }
+
 
 }

@@ -3,11 +3,11 @@ package com.techelevator.tenmo.services;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferDetails;
 import com.techelevator.util.BasicLogger;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
@@ -25,12 +25,10 @@ public class TransferServiceREST implements TransferService {
     }
 
 @Override
-    public Transfer createTransfer(Long transferTypeId, Long transferStatusId, Long accountTo, Long accountFrom, Double amount) {
-        String transferURL = baseUrl + "transfer/" + transferTypeId + "/" + transferStatusId + "/" +
-                accountTo + "/" + accountFrom + "/" + amount;
-         Transfer transfer =  new Transfer();
+    public Transfer createTransfer(Transfer transfer) {
+
         try {
-           transfer = restTemplate.exchange(transferURL, HttpMethod.POST, makeAuthEntity(), Transfer.class).getBody();
+           transfer = restTemplate.exchange(baseUrl + "transfer/create", HttpMethod.POST, makeAuthEntity(transfer), Transfer.class).getBody();
         } catch(RestClientResponseException e) {
             if (e.getMessage().contains("We know capitalism is hard. You don't have any money. :( ")) {
                 System.out.println("It looks like you don't have enough money for that transfer, babe.");
@@ -53,11 +51,12 @@ public class TransferServiceREST implements TransferService {
         return transfers;
     }
 
-    public Transfer getTransferById(AuthenticatedUser authenticatedUser, Transfer transferId) {
+    public Transfer getTransferById(AuthenticatedUser authenticatedUser, Long transferId) {
         Transfer transfer = null;
+        HttpEntity entity = makeAuthEntity();
         try {
             transfer = restTemplate.exchange(baseUrl + "transfer/" + transferId,
-                    HttpMethod.GET, makeAuthEntity(), Transfer.class).getBody();
+                    HttpMethod.GET, entity, Transfer.class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
         } catch (ResourceAccessException e) {
@@ -81,15 +80,42 @@ public class TransferServiceREST implements TransferService {
 
     public Transfer[] getTransfersByUserId(Long userId) {
         Transfer[] transfers = null;
+        HttpEntity entity = makeAuthEntity();
         try {
             transfers = restTemplate.exchange(baseUrl + "transfers/" + "user/" + userId,
-                    HttpMethod.GET, makeAuthEntity(), Transfer[].class).getBody();
+                    HttpMethod.GET, entity, Transfer[].class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
         } catch (ResourceAccessException e) {
             System.out.println("We could complete this request due to a network error. Please try again.");
         }
         return transfers;
+    }
+
+   public TransferDetails[] getAllTransferDetails(Long id) {
+        TransferDetails[] transfers = null;
+        try {
+            ResponseEntity<TransferDetails[]> response =
+                    restTemplate.exchange(baseUrl + "transferdetails/" + id, HttpMethod.GET,
+                            makeAuthEntity(), TransferDetails[].class);
+            transfers = response.getBody();
+
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transfers;
+    }
+
+    public void updateTransfer(Transfer transfer, Long transferId) {
+        try {
+            transfer = restTemplate.exchange(baseUrl + "transfer/update/" + transferId, HttpMethod.PUT, makeAuthEntity(transfer), Transfer.class).getBody();
+        } catch (RestClientResponseException e) {
+            BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
+        } catch (ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
     }
 
     private HttpEntity<Void> makeAuthEntity() {
