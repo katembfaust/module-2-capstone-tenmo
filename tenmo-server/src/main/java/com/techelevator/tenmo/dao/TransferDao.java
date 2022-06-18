@@ -19,7 +19,7 @@ public interface TransferDao {
 
     List<Transfer> getPendingTransfers(Long userId);
 
-   void updateTransfer(Transfer transfer, Long transferId);
+   void updateTransfer(Transfer transfer, Long transferStatusID, Long transferTypeId, Long transferId);
 
     Transfer[]  getTransfersByAccountId(Long accountId);
 

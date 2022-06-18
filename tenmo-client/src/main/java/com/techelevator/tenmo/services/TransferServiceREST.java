@@ -109,8 +109,9 @@ public class TransferServiceREST implements TransferService {
     }
 
     public void updateTransfer(Transfer transfer, Long transferId) {
+
         try {
-            transfer = restTemplate.exchange(baseUrl + "transfer/update/" + transferId, HttpMethod.PUT, makeAuthEntity(transfer), Transfer.class).getBody();
+            transfer = restTemplate.exchange(baseUrl + "transfer/update/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
         } catch (ResourceAccessException e) {

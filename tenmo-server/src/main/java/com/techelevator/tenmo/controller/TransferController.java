@@ -23,19 +23,15 @@ public class TransferController {
     @Autowired
     private TransferDao transferDao;
 
-    private TransferTypeDao transferTypeDao;
-
-    private TransferStatusDao transferStatusDao;
 
     public TransferController(){}
 
 
-    public TransferController(AccountDao accountDao, UserDao userDao, TransferDao transferDao, TransferTypeDao transferTypeDao, TransferStatusDao transferStatusDao) {
+    public TransferController(AccountDao accountDao, UserDao userDao, TransferDao transferDao) {
         this.accountDao = accountDao;
         this.userDao = userDao;
         this.transferDao = transferDao;
-        this.transferTypeDao = transferTypeDao;
-        this.transferStatusDao = transferStatusDao;
+
     }
 
 //    @PreAuthorize("permitAll")
@@ -79,10 +75,19 @@ public class TransferController {
     }
 
     @PreAuthorize("permitAll")
-    @RequestMapping(path = "transfer/update/{id}", method = RequestMethod.GET)
-    public void updateTransfer(@RequestBody Transfer transfer, @PathVariable Long transferId) {
-        transferDao.updateTransfer(transfer,transferId);
+    @PutMapping(value = "transfer/update/{id}")
+    public void updateTransfer(@RequestBody Transfer transfer, @PathVariable Long id) {
+       Long transStatID =  transfer.getTransferStatusId();
+       Long transTypeID = transfer.getTransferTypeId();
+        transferDao.updateTransfer(transfer,transStatID, transTypeID,id);
     }
+
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "transfer/{id}", method= RequestMethod.GET)
+    public Transfer getTransferByTransferId(@PathVariable Long id) {
+      return transferDao.getTransferById(id);
+    }
+
 
 
 }

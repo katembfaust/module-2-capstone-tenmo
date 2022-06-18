@@ -4,6 +4,9 @@ import com.techelevator.tenmo.dao.*;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.serverexceptions.AccountNotFoundException;
+import com.techelevator.tenmo.serverexceptions.InsufficientFunds;
+import com.techelevator.tenmo.serverexceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +27,7 @@ public class AccountController {
 
     private TransferDao transferDao;
 
-    private TransferTypeDao transferTypeDao;
 
-    private TransferStatusDao transferStatusDao;
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
@@ -37,14 +38,22 @@ public class AccountController {
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = "account/{id}", method = RequestMethod.GET)
-    public Account getAccountByAccountId(@Valid @PathVariable Long id) {
-        return accountDao.getAccountByAccountId(id);
+    public Account getAccountByAccountId(@Valid @PathVariable Long id) throws AccountNotFoundException {
+     if (accountDao.getAccountByAccountId(id) == null) {
+      throw new AccountNotFoundException();
+     } else {
+      return accountDao.getAccountByAccountId(id);
+     }
     }
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = "account/user/{id}", method = RequestMethod.GET)
-    public Account getAccountByUserId(@Valid @PathVariable Long id) {
-        return accountDao.getAccountByUserId(id);
+    public Account getAccountByUserId(@Valid @PathVariable Long id) throws UserNotFoundException {
+     if (accountDao.getAccountByUserId(id) == null) {
+      throw new UserNotFoundException();
+     } else {
+      return accountDao.getAccountByUserId(id);
+     }
     }
 
 
@@ -60,9 +69,13 @@ public class AccountController {
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = "withdrawal/user/{id}/{amount}", method = RequestMethod.PUT)
-    public Account withdrawalAccount(@Valid @RequestBody Account account, @PathVariable Long id, @PathVariable Double amount) {
-        return accountDao.withdrawAccount(account, id, amount);
-    }
+    public Account withdrawalAccount(@Valid @RequestBody Account account, @PathVariable Long id, @PathVariable Double amount) throws InsufficientFunds {
+    if(account.getBalance() >= amount) {
+    return accountDao.withdrawAccount(account, id, amount);
+    } else{
+    throw new InsufficientFunds();
+   }
+  }
 
     @PreAuthorize("permitAll")
     @RequestMapping(path = "accounts/", method = RequestMethod.GET)

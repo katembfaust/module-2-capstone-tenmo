@@ -48,6 +48,20 @@ public class UserService {
         return user;
     }
 
+    public User getByUserByUsername(String username) {
+       User user = new User();
+        try {
+            user = restTemplate.exchange(baseUrl + "user/" + username, HttpMethod.GET,
+                    makeAuthEntity(user), User.class).getBody();
+        } catch (RestClientResponseException e) {
+            System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("We could complete this request due to a network error. Please try again.");
+        }
+        return user;
+    }
+
+
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(user.getToken());

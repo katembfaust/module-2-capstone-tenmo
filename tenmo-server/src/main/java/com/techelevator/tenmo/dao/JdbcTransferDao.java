@@ -66,8 +66,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public Transfer getTransferById(Long transferId) {
-        String sql = " SELECT transfer_status_desc from transfer_status JOIN transfer ON " +
-                "transfer.transfer_status_id = transfer_status.transfer_status_id WHERE transfer_id = 3013; ";
+        String sql = " SELECT * from transfer WHERE transfer_id = ?; ";
         Transfer transfer = null;
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferId);
@@ -154,10 +153,10 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public void updateTransfer(Transfer transfer, Long transferId) {
+    public void updateTransfer(Transfer transfer, Long transferStatusID, Long transferTypeId, Long transferId) {
         String sql = "UPDATE transfer SET transfer_status_id = ?, transfer_type_id = ? WHERE transfer_id = ?; ";
 
-        jdbcTemplate.update(sql, transfer.getTransferTypeId(), transfer.getTransferStatusId(), transferId);
+        jdbcTemplate.update(sql, transferStatusID, transferTypeId, transferId);
     }
 
     private Transfer mapRowToTransfer(SqlRowSet results) {

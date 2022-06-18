@@ -57,13 +57,11 @@ public class TransferDetails {
         this.amount = amount;
     }
 
+//    used to print out transfer details!
     @Override
     public String toString() {
-        return "------------------------------------------------------------------\n" +
-                "Transfer ID" + "      " + "Status" + "      " + "Type" + "      " + "To" + "      " + "From" + "       " + "Amount " + "\n" +
-                "------------------------------------------------------------------\n" + "\n"
-                 + transferId + "             " + transferStatus + "    " + transferType + "    " +usernameTo + "   " + usernameFrom + "    " + amount + "\n" +
-                "------------------------------------------------------------------\n";
+        return
+                 transferId + "             " + transferStatus + "    " + transferType + "    " +usernameTo + "   " + usernameFrom + "    " + amount + "\n";
 
     }
 
