@@ -49,7 +49,7 @@ public class JdbcTransferDao implements TransferDao {
 
 
     @Override
-    public List<Transfer> getAllTransfers() {
+    public Transfer[] getAllTransfers() {
         String sql = " SELECT * FROM transfer;";
         List<Transfer> transfers = new ArrayList<>();
         try {
@@ -61,7 +61,7 @@ public class JdbcTransferDao implements TransferDao {
         } catch (DataAccessException e) {
             System.out.println("Error accessing database");
         }
-        return transfers;
+        return transfers.toArray(new Transfer[0]);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class JdbcTransferDao implements TransferDao {
     public void updateTransfer(Transfer transfer, Long transferStatusID, Long transferTypeId, Long transferId) {
         String sql = "UPDATE transfer SET transfer_status_id = ?, transfer_type_id = ? WHERE transfer_id = ?; ";
 
-        jdbcTemplate.update(sql, transferStatusID, transferTypeId, transferId);
+        jdbcTemplate.update(sql, transferTypeId, transferStatusID, transferId);
     }
 
     private Transfer mapRowToTransfer(SqlRowSet results) {

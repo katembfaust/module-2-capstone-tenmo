@@ -1,14 +1,16 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.customexceptions.InvalidTransferIdException;
 import com.techelevator.tenmo.customexceptions.InvalidUserException;
 import com.techelevator.tenmo.customexceptions.UserNotFoundException;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 
+import javax.swing.*;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Scanner;
+import java.util.Set;
 
 public class ConsoleService {
 
@@ -108,23 +110,31 @@ public class ConsoleService {
     public void printUsers(User[] users) {
         System.out.println("-------------------------------------------\n" +
                 "User ID             " + "Name \n" +
-                "-------------------------------------------\n" );
+                "-------------------------------------------\n");
         for (User userlist : users) {
-            System.out.println(userlist.getId() + "                " + userlist.getUsername());
+                System.out.println(userlist.getId() + "                " + userlist.getUsername());
+
+                System.out.println("-------------------------------------------\n");
         }
-        System.out.println("-------------------------------------------\n");
     }
 
+    public String currencyFormat(Double money) {
+        NumberFormat nF
+                = NumberFormat.getCurrencyInstance();
+        return nF.format(money);
+    }
+
+
     public boolean userValidation(Long idChosen, User[] userList, AuthenticatedUser currentUser) {
-        if (idChosen != 0) {
+        if (idChosen > 0) {
             try {
                 boolean validChoice = false;
 
                 for (User user : userList) {
-                    if (idChosen == currentUser.getUser().getId()) {
+                    if (idChosen.equals(currentUser.getUser().getId())) {
                         throw new InvalidUserException();
                     }
-                    if (user.getId() == idChosen) {
+                    if (idChosen.equals(user.getId())) {
                         validChoice = true;
                         break;
                     }
@@ -139,6 +149,25 @@ public class ConsoleService {
         }
         return false;
     }
+
+    public boolean transferValidation(Long idChosen, Transfer transfer, AuthenticatedUser currentUser) {
+        if (idChosen > 0) {
+            try {
+                boolean validChoice = false;
+
+                    if (idChosen.equals(transfer.getTransferId())) {
+                        validChoice = true;
+                    }
+                    else  {
+                       throw new InvalidTransferIdException();
+                    }
+                    return true;
+            } catch (InvalidTransferIdException e) {
+                    System.out.println(e.getMessage());
+        }
+    }
+            return false;
+        }
 
     public void printRequestHandleOptions() {
         System.out.println(

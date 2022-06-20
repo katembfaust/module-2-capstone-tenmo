@@ -56,7 +56,6 @@ public class AccountController {
      }
     }
 
-
     @PreAuthorize("permitAll")
     @RequestMapping(path = "users", method = RequestMethod.GET)
     public User[] getUsers() { return userDao.findAll(); }

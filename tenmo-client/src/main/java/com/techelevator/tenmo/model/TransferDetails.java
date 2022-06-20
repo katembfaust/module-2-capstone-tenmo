@@ -1,5 +1,7 @@
 package com.techelevator.tenmo.model;
 
+import java.text.NumberFormat;
+
 public class TransferDetails {
 
     private Long transferId;
@@ -60,8 +62,9 @@ public class TransferDetails {
 //    used to print out transfer details!
     @Override
     public String toString() {
+        NumberFormat nF = NumberFormat.getCurrencyInstance();
         return
-                 transferId + "             " + transferStatus + "    " + transferType + "    " +usernameTo + "   " + usernameFrom + "    " + amount + "\n";
+                 transferId + "             " + transferStatus + "    " + transferType + "    " +usernameTo + "   " + usernameFrom + "    " + nF.format(amount) + "\n";
 
     }
 

@@ -11,7 +11,7 @@ public interface TransferDao {
 
     void createTransfer( Transfer transfer, Long transferTypeId, Long transferStatusId, Long accountTo, Long accountFrom, Double amount);
 
-    List<Transfer> getAllTransfers();
+    Transfer[] getAllTransfers();
 
    Transfer getTransferById(Long transferId);
 

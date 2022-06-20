@@ -76,10 +76,10 @@ public class TransferController {
 
     @PreAuthorize("permitAll")
     @PutMapping(value = "transfer/update/{id}")
-    public void updateTransfer(@RequestBody Transfer transfer, @PathVariable Long id) {
+    public void updateTransfer(@Valid @RequestBody Transfer transfer, @PathVariable Long id) {
        Long transStatID =  transfer.getTransferStatusId();
        Long transTypeID = transfer.getTransferTypeId();
-        transferDao.updateTransfer(transfer,transStatID, transTypeID,id);
+        transferDao.updateTransfer(transfer, transTypeID, transStatID, id);
     }
 
     @PreAuthorize("permitAll")
@@ -88,6 +88,11 @@ public class TransferController {
       return transferDao.getTransferById(id);
     }
 
+    @PreAuthorize("permitAll")
+    @RequestMapping(path = "transfers", method = RequestMethod.GET)
+    public Transfer[] getAllTransfers() {
+        return transferDao.getAllTransfers();
+    }
 
 
 }

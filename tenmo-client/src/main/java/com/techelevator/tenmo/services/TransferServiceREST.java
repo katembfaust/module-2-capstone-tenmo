@@ -41,7 +41,7 @@ public class TransferServiceREST implements TransferService {
     public Transfer[] getAllTransfers() {
         Transfer[] transfers = null;
         try {
-            transfers = restTemplate.exchange(baseUrl + "transfer/", HttpMethod.GET,
+            transfers = restTemplate.exchange(baseUrl + "transfers/", HttpMethod.GET,
                     makeAuthEntity(), Transfer[].class).getBody();
         } catch (RestClientResponseException e) {
             System.out.println("We could not complete this request. Code: " + e.getRawStatusCode());
@@ -111,7 +111,7 @@ public class TransferServiceREST implements TransferService {
     public void updateTransfer(Transfer transfer, Long transferId) {
 
         try {
-            transfer = restTemplate.exchange(baseUrl + "transfer/update/" + transferId, HttpMethod.PUT, makeAuthEntity(), Transfer.class).getBody();
+            transfer = restTemplate.exchange(baseUrl + "transfer/update/" + transferId, HttpMethod.PUT, makeAuthEntity(transfer), Transfer.class).getBody();
         } catch (RestClientResponseException e) {
             BasicLogger.log(e.getRawStatusCode() + " : " + e.getStatusText());
         } catch (ResourceAccessException e) {
