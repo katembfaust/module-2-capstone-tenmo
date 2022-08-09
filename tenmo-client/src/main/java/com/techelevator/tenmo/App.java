@@ -275,12 +275,6 @@ public class App {
                 System.out.println("Your transfer to User ID: " + sendToUserID + " for the amount of " + consoleService.currencyFormat(amountToSend) + " has been initiated. \n" +
                         "Your new account balance is: " + consoleService.currencyFormat(accountServiceREST.getBalance()) + "\n");
             }
-//          Get user's updated balance to print
-//            Double updatedBalance = accountServiceREST.getBalance();
-//
-//            System.out.println("------------------------------------------------------\n");
-//            System.out.println("Your transfer to User ID: " + sendToUserID + " for the amount of " + consoleService.currencyFormat(amountToSend) + " has been initiated. \n" +
-//                    "Your new account balance is: " + consoleService.currencyFormat(accountServiceREST.getBalance()) + "\n");
         }
     }
 
